@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm tính cách & sở thích</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: Arial, sans-serif;
+            background: #f1f0f7;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px #0002;
+        }
+
+        h1 {
+            text-align: center;
+            color: #554477;
+        }
+
+        .intro {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .question {
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .question h3 {
+            color: #554477;
+            margin-top: 0;
+        }
+
+        .option {
+            display: block;
+            padding: 10px;
+            margin: 7px 0;
+            background: #f7f6fb;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background: #e9e3f5;
+        }
+
+        .option input {
+            margin-right: 8px;
+        }
+
+        button {
+            display: block;
+            margin: 25px auto;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            background: #654b91;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #49336f;
+        }
+
+        #result {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            border: 2px solid #b9a5d8;
+            border-radius: 12px;
+            background: #faf8ff;
+        }
+
+        #result h2 {
+            text-align: center;
+            color: #654b91;
+        }
+
+        #result img {
+            display: block;
+            width: 250px;
+            height: 200px;
+            object-fit: cover;
+            margin: 20px auto;
+            border-radius: 12px;
+        }
+
+        #result p {
+            line-height: 1.7;
+        }
+
+        .feedback {
+            margin-top: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .feedback h3 {
+            color: #654b91;
+        }
+
+        .feedback p {
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .error {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 18px;
+            }
+
+            #result img {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>BỘ CÂU HỎI TÍNH CÁCH & SỞ THÍCH</h1>
+
+    <p class="intro">
+        Hãy chọn đáp án phù hợp nhất với bản thân bạn!
+    </p>
+
+    <form id="quizForm">
+        <div id="questionList"></div>
+
+        <p id="error" class="error"></p>
+
+        <button type="submit">Gửi câu trả lời</button>
+    </form>
+
+    <!-- Khu vực hiển thị kết quả -->
+    <div id="result">
+        <h2 id="resultTitle"></h2>
+
+        <img id="resultImage" src="" alt="Hình ảnh minh họa">
+
+        <p id="resultText"></p>
+
+        <div class="feedback">
+            <h3>Nhận xét từng câu trả lời</h3>
+            <div id="feedbackList"></div>
+        </div>
+
+        <button type="button" onclick="resetQuiz()">
+            Làm lại
+        </button>
+    </div>
+
+</div>
+
+<script>
+    // Mảng chứa nội dung 10 câu hỏi và các đáp án
+    const questions = [
+        {
+            question: "Khi một ngày cuối tuần rảnh rỗi hoàn toàn đến, hoạt động lý tưởng nhất của bạn là gì?",
+            options: [
+                ["A", "Nghe nhạc, xem phim hoặc đọc sách một mình ở góc quen thuộc.", "Bạn là một tâm hồn hướng nội, biết cách tận hưởng sự yên bình và tái tạo năng lượng từ bên trong."],
+                ["B", "Hẹn bạn bè cà phê, dạo phố hoặc tham gia các hoạt động tụ tập đông người.", "Bạn cực kỳ năng động và hướng ngoại, luôn là trung tâm năng lượng mang lại niềm vui cho mọi người."],
+                ["C", "Khám phá địa điểm mới, thiên nhiên hoặc đi chụp ảnh.", "Bạn có máu phiêu lưu, thích tự do và luôn tò mò về thế giới rộng lớn."],
+                ["D", "Chơi game hoặc thử sức với một dự án thủ công, nghệ thuật cá nhân.", "Bạn sáng tạo, có chiều sâu nội tâm và tập trung vào những gì mình đam mê."]
+            ]
+        },
+        {
+            question: "Thể loại âm nhạc nào có thể chạm đến cảm xúc của bạn nhanh nhất?",
+            options: [
+                ["A", "Ballad nhẹ nhàng, trữ tình hoặc Lo-fi êm dịu.", "Bạn là người sống tình cảm, hoài niệm và dễ thấu cảm với cảm xúc của người khác."],
+                ["B", "EDM, Pop sôi động hoặc Hip-hop cá tính.", "Bạn luôn tràn đầy nhiệt huyết, tự tin và thích sự bùng nổ."],
+                ["C", "Indie, Acoustic hoặc Rock cổ điển.", "Bạn có gu thẩm mỹ độc đáo, thích sự mộc mạc và không thích chạy theo số đông."],
+                ["D", "Nhạc không lời, Classical hoặc Jazz.", "Bạn tinh tế, điềm đạm, yêu chuộng sự hoàn mỹ và có tư duy lý trí."]
+            ]
+        },
+        {
+            question: "Bộ môn thể thao hoặc hoạt động vận động nào phản ánh đúng nhất tinh thần của bạn?",
+            options: [
+                ["A", "Chạy bộ, đạp xe hoặc yoga.", "Bạn kiên trì, có tính kỷ luật và biết cách chăm sóc bản thân."],
+                ["B", "Bóng đá, bóng rổ hoặc thể thao đồng đội.", "Bạn có tinh thần đồng đội cao, quyết đoán và thích chinh phục thử thách."],
+                ["C", "Leo núi, lướt sóng, võ thuật hoặc thể thao mạo hiểm.", "Bạn ưa khám phá, dũng cảm và không ngại trải nghiệm những điều mới."],
+                ["D", "Đi bộ ngắm cảnh hoặc các hoạt động nhẹ nhàng.", "Bạn thực tế, biết cân bằng năng lượng và ưu tiên sự thoải mái."]
+            ]
+        },
+        {
+            question: "Trò chơi hoặc hình thức giải trí nào thường thu hút bạn nhất?",
+            options: [
+                ["A", "Game chiến thuật, đấu trí, giải đố.", "Bạn có tư duy logic, thích phân tích vấn đề và suy nghĩ trước khi hành động."],
+                ["B", "Game hành động, nhập vai, MOBA hoặc FPS.", "Bạn thích thử thách, có phản xạ nhanh và tinh thần cạnh tranh."],
+                ["C", "Game mô phỏng xây dựng, nông trại.", "Bạn yêu thích sự bình yên, sáng tạo và có tính kiên nhẫn."],
+                ["D", "Board game, ma sói cùng nhóm bạn.", "Bạn khéo léo trong giao tiếp và thích những hoạt động gắn kết tập thể."]
+            ]
+        },
+        {
+            question: "Phong cách trang phục hàng ngày giúp bạn tự tin nhất là gì?",
+            options: [
+                ["A", "Đơn giản, thoải mái: áo phông, quần jean, sneaker.", "Bạn thực tế, không thích phô trương và đề cao sự tiện dụng."],
+                ["B", "Cá tính, thời thượng, Streetwear hoặc Unisex.", "Bạn nhạy bén với thời trang, có bản sắc riêng và thích thể hiện cá tính."],
+                ["C", "Lịch sự, trang nhã, thanh lịch.", "Bạn chỉn chu, tôn trọng bản thân và luôn muốn tạo ấn tượng chuyên nghiệp."],
+                ["D", "Vintage, cổ điển hoặc Bohemian.", "Bạn có cái tôi nghệ thuật và luôn trung thành với phong cách riêng."]
+            ]
+        },
+        {
+            question: "Tông màu nào chủ đạo trong tủ đồ hoặc không gian sống của bạn?",
+            options: [
+                ["A", "Trắng, đen, xám, beige.", "Bạn yêu thích sự tối giản, gọn gàng và cuộc sống bình yên."],
+                ["B", "Đỏ, cam, vàng rực rỡ.", "Bạn nhiệt huyết, cởi mở và luôn lan tỏa năng lượng tích cực."],
+                ["C", "Xanh dương, xanh lá đậm, tím than.", "Bạn điềm tĩnh, sâu sắc và có khả năng giữ bình tĩnh trước áp lực."],
+                ["D", "Hồng nhạt, xanh mint, vàng pastel.", "Bạn dịu dàng, lãng mạn và yêu thích những điều nhẹ nhàng."]
+            ]
+        },
+        {
+            question: "Gu người yêu lý tưởng của bạn là gì?",
+            options: [
+                ["A", "Một người ấm áp, biết lắng nghe và thấu hiểu.", "Bạn coi trọng sự an toàn, chân thành và thấu hiểu trong một mối quan hệ."],
+                ["B", "Một người thông minh, tài giỏi và có chí tiến thủ.", "Bạn coi trọng trí tuệ, sự phát triển và khả năng cùng nhau tiến bộ."],
+                ["C", "Một người hài hước, luôn biết cách làm bạn cười.", "Bạn yêu thích sự lạc quan và coi trọng niềm vui trong các mối quan hệ."],
+                ["D", "Một người tự lập, cá tính và tôn trọng không gian riêng.", "Bạn đề cao sự độc lập và tôn trọng lẫn nhau."]
+            ]
+        },
+        {
+            question: "Thức uống yêu thích giúp bạn lấy lại tinh thần mỗi ngày là gì?",
+            options: [
+                ["A", "Cà phê đen đá hoặc Espresso.", "Bạn mạnh mẽ, thực tế và luôn tập trung vào công việc."],
+                ["B", "Trà sữa, trà trái cây hoặc cacao nóng.", "Bạn thích sự ngọt ngào và biết cách tận hưởng những niềm vui nhỏ."],
+                ["C", "Trà xanh, trà ô long hoặc nước lọc.", "Bạn hướng đến sự thanh thản, cân bằng và minh mẫn."],
+                ["D", "Mocktail, nước ép hoặc thức uống theo mùa.", "Bạn thích sự mới lạ và luôn tò mò trải nghiệm những hương vị độc đáo."]
+            ]
+        },
+        {
+            question: "Mẫu người bạn thân thiết nhất trong nhóm thường là người thế nào?",
+            options: [
+                ["A", "Người hợp rơ với bạn trong mọi hoàn cảnh.", "Bạn coi trọng sự đồng điệu và mong muốn được thấu hiểu."],
+                ["B", "Người có tính cách bù trừ cho bạn.", "Bạn biết trân trọng sự khác biệt và cách mọi người bổ sung cho nhau."],
+                ["C", "Người luôn cho bạn những lời khuyên sáng suốt.", "Bạn coi trọng những lời khuyên chân thành và sự hỗ trợ tinh thần."],
+                ["D", "Những người bạn vui tính, thích trải nghiệm.", "Bạn trẻ trung, lạc quan và trân trọng những khoảnh khắc vui vẻ."]
+            ]
+        },
+        {
+            question: "Nếu có một siêu năng lực, bạn sẽ chọn gì?",
+            options: [
+                ["A", "Đọc được suy nghĩ của người khác.", "Bạn tò mò, nhạy cảm với các mối quan hệ và muốn thấu hiểu mọi người."],
+                ["B", "Dịch chuyển tức thời đến bất cứ đâu.", "Bạn khao khát tự do, khám phá và mở rộng trải nghiệm."],
+                ["C", "Quay ngược thời gian.", "Bạn trân trọng kỷ niệm và có phần hoài niệm về những khoảnh khắc đẹp."],
+                ["D", "Ngừng đọng thời gian.", "Bạn có nhiều đam mê và luôn mong muốn có thêm thời gian cho những điều mình yêu thích."]
+            ]
+        }
+    ];
+
+    // Mảng lưu kết quả tổng kết theo A, B, C, D
+    const personality = {
+        A: {
+            title: "TRẦM ỔN & TINH TẾ",
+            text: "Bạn mang phong cách Trầm ổn & Tinh tế – một chốn bình yên giữa thế giới xô bồ. Bạn thường trân trọng những điều giản dị, yêu thích sự cân bằng và có xu hướng quan sát, suy nghĩ sâu sắc. Bạn biết cách tận hưởng thế giới theo nhịp điệu riêng của mình.",
+            image: "images/A.jpg"
+        },
+        B: {
+            title: "NĂNG ĐỘNG & TỎA SÁNG",
+            text: "Bạn mang phong cách Năng động & Tỏa sáng – luôn tràn đầy nhiệt huyết và sức hút tự nhiên. Bạn yêu thích sự sôi nổi, thích thử thách và thường mang đến nguồn năng lượng tích cực cho những người xung quanh.",
+            image: "images/B.jpg"
+        },
+        C: {
+            title: "BẢN LĨNH & ĐỘC LẬP",
+            text: "Bạn mang phong cách Bản lĩnh & Độc lập – sống có chiều sâu, rõ ràng và kiên định. Bạn thích tự khám phá, có chính kiến và luôn muốn trải nghiệm thế giới theo cách của riêng mình.",
+            image: "images/C.jpg"
+        },
+        D: {
+            title: "SÁNG TẠO & ĐỘC ĐÁO",
+            text: "Bạn mang phong cách Sáng tạo & Độc đáo – luôn phá cách và có thế giới nội tâm phong phú. Bạn yêu thích những điều mới mẻ, có trí tưởng tượng tốt và không ngại thể hiện cá tính riêng.",
+            image: "images/D.jpg"
+        }
+    };
+
+    // Hiển thị câu hỏi từ mảng questions
+    function showQuestions() {
+        let content = "";
+
+        questions.forEach((q, index) => {
+            content += `
+                <div class="question">
+                    <h3>Câu ${index + 1}: ${q.question}</h3>
+            `;
+
+            q.options.forEach(option => {
+                content += `
+                    <label class="option">
+                        <input type="radio"
+                               name="q${index}"
+                               value="${option[0]}">
+                        <b>${option[0]}.</b> ${option[1]}
+                    </label>
+                `;
+            });
+
+            content += `</div>`;
+        });
+
+        document.getElementById("questionList").innerHTML = content;
+    }
+
+    // Gọi hàm hiển thị câu hỏi
+    showQuestions();
+
+    // Xử lý khi nhấn nút gửi
+    document.getElementById("quizForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        let answers = [];
+        let count = { A: 0, B: 0, C: 0, D: 0 };
+
+        // Lấy câu trả lời bằng querySelector
+        for (let i = 0; i < questions.length; i++) {
+            let selected = document.querySelector(
+                'input[name="q' + i + '"]:checked'
+            );
+
+            if (selected == null) {
+                document.getElementById("error").innerHTML =
+                    "Vui lòng trả lời đầy đủ 10 câu hỏi!";
+                return;
+            }
+
+            answers.push(selected.value);
+            count[selected.value]++;
+        }
+
+        document.getElementById("error").innerHTML = "";
+
+        // Tìm đáp án xuất hiện nhiều nhất
+        let max = Math.max(count.A, count.B, count.C, count.D);
+
+        // Nếu có nhiều đáp án bằng điểm cao nhất thì hiển thị nhiều phong cách
+        let winners = Object.keys(count).filter(key => count[key] === max);
+
+        let resultTitle = "";
+        let resultText = "";
+        let resultImage = "";
+
+        if (winners.length === 1) {
+            let result = personality[winners[0]];
+
+            resultTitle = result.title;
+            resultText = result.text;
+            resultImage = result.image;
+        } else {
+            resultTitle = "BẠN LÀ SỰ KẾT HỢP ĐỘC ĐÁO!";
+
+            resultText = "Bạn có sự kết hợp của nhiều phong cách tính cách khác nhau. " +
+                winners.map(key => personality[key].title).join(", ") +
+                ". Điều này cho thấy bạn có nhiều sở thích và khía cạnh thú vị.";
+
+            resultImage = "images/mix.jpg";
+        }
+
+        // Hiển thị tiêu đề, hình ảnh và đoạn nhận xét
+        document.getElementById("resultTitle").innerHTML = resultTitle;
+        document.getElementById("resultText").innerHTML = resultText;
+        document.getElementById("resultImage").src = resultImage;
+
+        // Tạo nhận xét riêng cho từng câu
+        let feedback = "";
+
+        answers.forEach((answer, index) => {
+            let option = questions[index].options.find(
+                item => item[0] === answer
+            );
+
+            feedback += `
+                <p>
+                    <b>Câu ${index + 1} - Đáp án ${answer}:</b><br>
+                    ${option[2]}
+                </p>
+            `;
+        });
+
+        document.getElementById("feedbackList").innerHTML = feedback;
+
+        // Ẩn form và hiện kết quả
+        document.getElementById("quizForm").style.display = "none";
+        document.getElementById("result").style.display = "block";
+
+        // Cuộn đến phần kết quả
+        document.getElementById("result").scrollIntoView({
+            behavior: "smooth"
+        });
+    });
+
+    // Làm lại bài trắc nghiệm
+    function resetQuiz() {
+        document.getElementById("quizForm").reset();
+
+        document.getElementById("quizForm").style.display = "block";
+        document.getElementById("result").style.display = "none";
+        document.getElementById("error").innerHTML = "";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+</script>
+
+</body>
+</html>
